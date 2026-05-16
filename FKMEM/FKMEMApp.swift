@@ -1,17 +1,12 @@
-//
-//  FKMEMApp.swift
-//  FKMEM
-//
-//  Created by Mintae Kim on 5/16/26.
-//
-
 import SwiftUI
 
 @main
 struct FKMEMApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
     var body: some Scene {
-        WindowGroup {
-            ContentView()
+        Settings {
+            EmptyView()
         }
     }
 }
