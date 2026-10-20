@@ -99,6 +99,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     }
 
     // 아이콘 재클릭뿐 아니라 바깥 클릭(.transient)으로 닫혀도 평상시 주기로 돌아가야 한다
+    // isShown 은 닫힘 애니메이션이 끝나 이 콜백이 올 때까지 true 라서 togglePopover 가 그 사이에 다시 열 수 없다
+    // 따라서 이 콜백이 다시 연 팝오버의 3초 주기를 덮어쓰는 일은 없다
     func popoverDidClose(_ notification: Notification) {
         startIdleRefresh()
     }
