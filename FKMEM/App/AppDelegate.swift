@@ -2,11 +2,10 @@ import AppKit
 import SwiftUI
 
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     private let store = MemoryStore()
     private var statusItem: NSStatusItem!
     private var popover: NSPopover!
-    private var idleTimer: Timer?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupStatusItem()
@@ -70,6 +69,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         popover.contentSize = NSSize(width: 360, height: 480)
         popover.behavior = .transient
         popover.animates = true
+        popover.delegate = self
         popover.contentViewController = NSHostingController(rootView: PopoverView(store: store))
     }
 
@@ -89,15 +89,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func togglePopover(from button: NSStatusBarButton) {
         if popover.isShown {
             popover.performClose(nil)
-            startIdleRefresh()
         } else {
             store.refreshNow()
             NSApp.activate(ignoringOtherApps: true)
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
             popover.contentViewController?.view.window?.makeKey()
             store.startAutoRefresh(interval: 3)
-            idleTimer?.invalidate()
         }
+    }
+
+    // 아이콘 재클릭뿐 아니라 바깥 클릭(.transient)으로 닫혀도 평상시 주기로 돌아가야 한다
+    // isShown 은 닫힘 애니메이션이 끝나 이 콜백이 올 때까지 true 라서 togglePopover 가 그 사이에 다시 열 수 없다
+    // 따라서 이 콜백이 다시 연 팝오버의 3초 주기를 덮어쓰는 일은 없다
+    func popoverDidClose(_ notification: Notification) {
+        startIdleRefresh()
     }
 
     private func startIdleRefresh() {
