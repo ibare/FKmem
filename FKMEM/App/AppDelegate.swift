@@ -2,11 +2,10 @@ import AppKit
 import SwiftUI
 
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     private let store = MemoryStore()
     private var statusItem: NSStatusItem!
     private var popover: NSPopover!
-    private var idleTimer: Timer?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupStatusItem()
@@ -70,6 +69,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         popover.contentSize = NSSize(width: 360, height: 480)
         popover.behavior = .transient
         popover.animates = true
+        popover.delegate = self
         popover.contentViewController = NSHostingController(rootView: PopoverView(store: store))
     }
 
@@ -89,15 +89,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func togglePopover(from button: NSStatusBarButton) {
         if popover.isShown {
             popover.performClose(nil)
-            startIdleRefresh()
         } else {
             store.refreshNow()
             NSApp.activate(ignoringOtherApps: true)
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
             popover.contentViewController?.view.window?.makeKey()
             store.startAutoRefresh(interval: 3)
-            idleTimer?.invalidate()
         }
+    }
+
+    // 아이콘 재클릭뿐 아니라 바깥 클릭(.transient)으로 닫혀도 평상시 주기로 돌아가야 한다
+    func popoverDidClose(_ notification: Notification) {
+        startIdleRefresh()
     }
 
     private func startIdleRefresh() {
