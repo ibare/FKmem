@@ -86,11 +86,29 @@ FKMEM은 아무 데이터도 외부로 보내지 않습니다.
 
 ## 설치
 
-아직 배포용 빌드는 없습니다. 소스에서 직접 빌드해 주세요.
+**요구 사항**: macOS 26.2 이상
 
-**요구 사항**: macOS 26.2 이상, Xcode 26.2 이상
+릴리즈에서 내려받아도 되고, 소스에서 직접 빌드해도 됩니다.
 
-### 터미널에서
+### 방법 1. 릴리즈에서 내려받기
+
+1. [Releases](https://github.com/ibare/FKmem/releases/latest) 페이지에서 `FKMEM-<버전>.zip`을 내려받습니다.
+2. 압축을 풀고 `FKMEM.app`을 응용 프로그램 폴더로 옮깁니다.
+3. 실행하면 메뉴바에 아이콘이 나타납니다.
+
+Developer ID로 서명하고 Apple 공증을 받은 빌드입니다. 처음 열 때 인터넷에서 받은 앱을 열지 묻는 확인 창이 한 번 뜨는데, **열기**를 누르면 됩니다.
+
+### 방법 2. 소스에서 직접 빌드하기
+
+Xcode 26.2 이상이 필요합니다.
+
+**Xcode에서**
+
+1. 리포를 clone한 뒤 `FKMEM.xcodeproj`를 엽니다.
+2. FKMEM 타깃의 **Signing & Capabilities**에서 Team을 본인 계정으로 바꾸거나, Signing Certificate를 **Sign to Run Locally**로 지정합니다.
+3. ⌘R로 실행합니다.
+
+**터미널에서**
 
 ```sh
 git clone https://github.com/ibare/FKmem.git
@@ -102,12 +120,6 @@ open /Applications/FKMEM.app
 ```
 
 `DEVELOPMENT_TEAM= CODE_SIGN_IDENTITY=-`는 Apple 개발자 계정 없이 내 Mac에서만 실행할 수 있도록 서명하는 옵션입니다.
-
-### Xcode에서
-
-1. `FKMEM.xcodeproj`를 엽니다.
-2. FKMEM 타깃의 **Signing & Capabilities**에서 Team을 본인 계정으로 바꾸거나, Signing Certificate를 **Sign to Run Locally**로 지정합니다.
-3. ⌘R로 실행합니다.
 
 ### 로그인할 때 자동 실행
 
@@ -127,6 +139,8 @@ FKMEM/
 ├── Models/                             데이터 모델
 ├── ViewModel/MemoryStore.swift         주기적 측정과 압력 이력
 └── Views/PopoverView.swift             클릭하면 열리는 창
+scripts/
+└── release.sh                          서명·공증된 배포용 zip 만들기 (사용법은 파일 상단 참고)
 ```
 
 외부 패키지 의존성은 없습니다.
